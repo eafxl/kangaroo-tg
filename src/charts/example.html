@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Today's Date</title>
+</head>
+
+<body>
+<script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+<script>
+    // const chart = LightweightCharts.createChart(document.body, { width: 400, height: 300 });
+    // const lineSeries = chart.addLineSeries();
+    // lineSeries.setData([
+    //     { time: '2019-04-11', value: 80.01 },
+    //     { time: '2019-04-12', value: 96.63 },
+    //     { time: '2019-04-13', value: 76.64 },
+    //     { time: '2019-04-14', value: 81.89 },
+    //     { time: '2019-04-15', value: 74.43 },
+    //     { time: '2019-04-16', value: 80.01 },
+    //     { time: '2019-04-17', value: 96.63 },
+    //     { time: '2019-04-18', value: 76.64 },
+    //     { time: '2019-04-19', value: 81.89 },
+    //     { time: '2019-04-20', value: 74.43 },
+    // ]);
+
+    const chart = LightweightCharts.createChart(document.body, { width: 800, height: 600,
+      layout: {
+        textColor: 'black',
+        background: { type: 'solid', color: 'white' },
+      }}
+    );
+
+    const series = chart.addCandlestickSeries({
+      upColor: '#26a69a', downColor: '#ef5350', borderVisible: false,
+      wickUpColor: '#26a69a', wickDownColor: '#ef5350',
+    });
+
+    const data = [
+      {
+        time: { year: 2018, month: 9, day: 23 },
+        open: 32.267626500691215,
+        high: 34.452661663723774,
+        low: 26.096868360824704,
+        close: 29.573918833457004,
+      },
+      {
+        time: { year: 2018, month: 9, day: 24 },
+        open: 27.33996760497746,
+        high: 35.8060364835531,
+        low: 27.33996760497746,
+        close: 33.06283432964511,
+      },
+      {
+        time: { year: 2018, month: 9, day: 25 },
+        open: 31.1654368745013,
+        high: 31.97284477478497,
+        low: 26.766743287285593,
+        close: 27.364979322283386,
+      },
+      {
+        time: { year: 2018, month: 9, day: 26 },
+        open: 29.5901452337888,
+        high: 32.147919593347474,
+        low: 27.53289219709677,
+        close: 29.202912415085272,
+      },
+      {
+        time: { year: 2018, month: 9, day: 27 },
+        open: 27.561741523265923,
+        high: 35.11649043301526,
+        low: 25.20035866163233,
+        close: 31.14520649627546,
+      },
+      {
+        time: { year: 2018, month: 9, day: 28 },
+        open: 31.925975006823798,
+        high: 31.925975006823798,
+        low: 28.998500720406675,
+        close: 29.87723790403876,
+      },
+      {
+        time: { year: 2018, month: 9, day: 29 },
+        open: 30.826956088992475,
+        high: 34.79463130873015,
+        low: 25.291546123273097,
+        close: 28.994812708315987,
+      },
+      {
+        time: { year: 2018, month: 9, day: 30 },
+        open: 31.202920145287838,
+        high: 33.19178819590413,
+        low: 23.94419012923956,
+        close: 31.47253745770869,
+      },
+      {
+        time: { year: 2018, month: 10, day: 1 },
+        open: 26.927794164758666,
+        high: 34.6744456778885,
+        low: 26.927794164758666,
+        close: 31.091122539737423,
+      },
+      {
+        time: { year: 2018, month: 10, day: 2 },
+        open: 26.452041173938298,
+        high: 34.527917622572154,
+        low: 26.452041173938298,
+        close: 27.65703395829094,
+      },
+      {
+        time: { year: 2018, month: 10, day: 3 },
+        open: 27.74629982387605,
+        high: 29.300441707649835,
+        low: 23.761300216231263,
+        close: 29.182874625005628,
+      },
+      {
+        time: { year: 2018, month: 10, day: 4 },
+        open: 30.41599722290526,
+        high: 31.942643078777103,
+        low: 27.09925359459428,
+        close: 30.918477883682872,
+      },
+      {
+        time: { year: 2018, month: 10, day: 5 },
+        open: 25.76549797105683,
+        high: 33.4650523853759,
+        low: 25.76549797105683,
+        close: 28.15984801386293,
+      }
+    ];
+    const datesForMarkers = [data[data.length - 3], data[data.length - 2]];
+    let indexOfMinPrice = 0;
+    for (let i = 1; i < datesForMarkers.length; i++) {
+      if (datesForMarkers[i].high < datesForMarkers[indexOfMinPrice].high) {
+        indexOfMinPrice = i;
+      }
+    }
+
+    const markers = [
+      {
+        time: data[data.length - 1].time,
+        position: 'belowBar', //aboveBar
+        color: '#56c473', // #ee4c43
+        shape: 'arrowUp', //arrowDown
+        text: '',
+      },
+    ];
+
+    series.setData(data);
+    series.setMarkers(markers);
+    chart.timeScale().applyOptions({
+      timeVisible: true
+    });
+    chart.priceScale().fitContent();
+    // chart.timeScale().fitContent();
+</script>
+</body>
