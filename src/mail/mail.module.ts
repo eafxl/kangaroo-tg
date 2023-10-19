@@ -1,6 +1,6 @@
 import {Module} from '@nestjs/common';
 import {ConfigModule} from '@nestjs/config';
-import {MailerModule} from 'src/mailer/mailer.module';
+import {MailerModule} from '../mailer';
 import {MailService} from './mail.service';
 
 @Module({

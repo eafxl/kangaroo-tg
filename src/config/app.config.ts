@@ -1,6 +1,7 @@
 import {registerAs} from '@nestjs/config';
-import validateConfig from 'src/utils/validate-config';
-import {IsEnum, IsInt, IsOptional, IsString, IsUrl, Max, Min} from 'class-validator';
+import {IsEmail, IsEnum, IsInt, IsIP, IsOptional, IsString, Max, Min} from 'class-validator';
+import {Transform} from 'class-transformer';
+import validateConfig from '../utils/validate-config';
 import {AppConfig} from './config.type';
 
 enum Environment {
@@ -9,7 +10,7 @@ enum Environment {
     Test = 'test'
 }
 
-class EnvironmentVariablesValidator {
+class EnvironmentVariablesScheme {
     @IsEnum(Environment)
     @IsOptional()
     NODE_ENV: Environment;
@@ -18,45 +19,53 @@ class EnvironmentVariablesValidator {
     @Min(0)
     @Max(65535)
     @IsOptional()
+    @Transform(({value}) => Number.parseInt(value))
     APP_PORT: number;
 
-    @IsUrl({require_tld: false})
+    @IsString()
     @IsOptional()
-    FRONTEND_DOMAIN: string;
-
-    @IsUrl({require_tld: false})
-    @IsOptional()
-    BACKEND_DOMAIN: string;
+    APP_NAME: string;
 
     @IsString()
     @IsOptional()
     API_PREFIX: string;
 
     @IsString()
-    @IsOptional()
-    APP_FALLBACK_LANGUAGE: string;
+    WEBHOOK_SECRET: string;
+
+    @Transform(({value}) => value.split(','))
+    @IsEmail({}, {each: true})
+    EMAIL_DESTINATIONS: string[];
+
+    @Transform(({value}) => value.split(','))
+    @IsIP(4, {each: true})
+    WHITELIST_IPS: string[];
 
     @IsString()
-    @IsOptional()
-    APP_HEADER_LANGUAGE: string;
+    TELEGRAM_TOKEN: string;
+
+    @Transform(({value}) => value.split(','))
+    @IsString({each: true})
+    CHAT_IDS: string[];
 }
 
 export default registerAs<AppConfig>('app', () => {
-    validateConfig(process.env, EnvironmentVariablesValidator);
+    validateConfig(process.env, EnvironmentVariablesScheme);
 
     return {
         nodeEnv: process.env.NODE_ENV || 'development',
         name: process.env.APP_NAME || 'app',
         workingDirectory: process.env.PWD || process.cwd(),
-        frontendDomain: process.env.FRONTEND_DOMAIN,
-        backendDomain: process.env.BACKEND_DOMAIN ?? 'http://localhost',
         port: process.env.APP_PORT
             ? parseInt(process.env.APP_PORT, 10)
             : process.env.PORT
             ? parseInt(process.env.PORT, 10)
             : 3000,
         apiPrefix: process.env.API_PREFIX || 'api',
-        fallbackLanguage: process.env.APP_FALLBACK_LANGUAGE || 'en',
-        headerLanguage: process.env.APP_HEADER_LANGUAGE || 'x-custom-lang'
+        webhookSecret: process.env.WEBHOOK_SECRET,
+        emailDestinations: process.env.EMAIL_DESTINATIONS.split(','),
+        whiteListIps: process.env.WHITELIST_IPS.split(','),
+        telegramToken: process.env.TELEGRAM_TOKEN,
+        chatIds: process.env.CHAT_IDS.split(',')
     };
 });
