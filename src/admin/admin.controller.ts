@@ -1,6 +1,5 @@
-import {Body, Controller, Post, Req} from '@nestjs/common';
+import {Body, Controller, Post, Headers} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
-import {Request} from 'express';
 import {MailService} from '../mail';
 import {PREFIX_SUBNET} from '../utils';
 import {TelegramService} from './telegram.service';
@@ -25,9 +24,9 @@ export class AdminController {
     }
 
     @Post('/kangaroo/main')
-    async hook(@Req() request: Request, @Body() body: MainHookPayloadDto) {
-        let {ip} = request;
-        ip = ip.replace(PREFIX_SUBNET, '');
+    async hook(@Headers() headers: unknown, @Body() body: MainHookPayloadDto) {
+        const forwardedIps = headers['x-forwarded-for']?.split(', ');
+        const ip = forwardedIps?.length ? forwardedIps[0] : 'ip not extracted';
 
         if (this.env === 'production') {
             if (!this.whitelist.includes(ip)) {
